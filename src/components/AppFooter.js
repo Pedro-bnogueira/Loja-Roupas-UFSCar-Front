@@ -19,9 +19,8 @@ function AppFooter() {
                 <strong>
                     Desenvolvido por{' '}
                     <p color="inherit" underline="none">
-                        Trupe da diária
+                        Trupe da Diária 🍂 🥃
                     </p>
-                    .
                 </strong>
             </Typography>
         </Box>
