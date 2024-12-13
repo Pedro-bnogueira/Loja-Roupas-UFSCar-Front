@@ -1,5 +1,4 @@
-// src/components/AppMenu.js
-import React from 'react';
+import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Drawer,
@@ -12,15 +11,19 @@ import {
   Typography,
 } from '@mui/material';
 import HomeIcon from '@mui/icons-material/Home';
-
+import PeopleIcon from '@mui/icons-material/People'; 
+import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings'; 
+import { AuthContext } from '../context/AuthContext';
 
 const menuItems = [
   { text: 'Início', icon: <HomeIcon />, link: '/' },
-  // Adicione outros itens de menu aqui
-  
+  { text: 'Usuários', icon: <PeopleIcon />, link: '/users', adminOnly: false },
+  { text: 'Administração', icon: <AdminPanelSettingsIcon />, link: '/adm/users', adminOnly: true },
 ];
 
 export default function AppMenu({ open, setOpen }) {
+  const { user } = useContext(AuthContext);
+
   const toggleDrawer = (isOpen) => (event) => {
     if (
       event.type === 'keydown' &&
@@ -54,7 +57,7 @@ export default function AppMenu({ open, setOpen }) {
       >
         <Box
           component="img"
-          src="/assets/logo.png"
+          src="/assets/img/logo.png"
           alt="Logo"
           sx={{
             width: 80,
@@ -73,27 +76,28 @@ export default function AppMenu({ open, setOpen }) {
 
       {/* Lista de Itens de Menu */}
       <List>
-        {menuItems.map((item) => (
-          <ListItemButton
-            component={Link}
-            to={item.link}
-            key={item.text}
-            sx={{
-              color: 'white',
-              '&:hover': {
-                backgroundColor: 'primary.dark',
-              },
-            }}
-          >
-            <ListItemIcon sx={{ color: 'inherit' }}>
-              {item.icon}
-            </ListItemIcon>
-            <ListItemText primary={item.text} />
-          </ListItemButton>
-        ))}
+        {menuItems
+          .filter(item => !item.adminOnly || (item.adminOnly && user && user.accessLevel === 'admin'))
+          .map((item) => (
+            <ListItemButton
+              component={Link}
+              to={item.link}
+              key={item.text}
+              sx={{
+                color: 'white',
+                '&:hover': {
+                  backgroundColor: 'primary.dark',
+                },
+              }}
+            >
+              <ListItemIcon sx={{ color: 'inherit' }}>
+                {item.icon}
+              </ListItemIcon>
+              <ListItemText primary={item.text} />
+            </ListItemButton>
+          ))}
       </List>
 
-      {/* Você pode adicionar mais conteúdo aqui, como rodapé ou seções adicionais */}
     </Box>
   );
 
