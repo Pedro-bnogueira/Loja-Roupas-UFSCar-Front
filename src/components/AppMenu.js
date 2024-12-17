@@ -12,12 +12,14 @@ import {
 } from '@mui/material';
 import HomeIcon from '@mui/icons-material/Home';
 import PeopleIcon from '@mui/icons-material/People'; 
-import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings'; 
+import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
+import StorefrontIcon from '@mui/icons-material/Storefront';
 import { AuthContext } from '../context/AuthContext';
+import logo from '../assets/img/logo.png'
 
 const menuItems = [
   { text: 'Início', icon: <HomeIcon />, link: '/' },
-  { text: 'Usuários', icon: <PeopleIcon />, link: '/users', adminOnly: false },
+  { text: 'Produtos', icon: <StorefrontIcon />, link: '/products', adminOnly: false },
   { text: 'Administração', icon: <AdminPanelSettingsIcon />, link: '/adm/users', adminOnly: true },
 ];
 
@@ -57,7 +59,7 @@ export default function AppMenu({ open, setOpen }) {
       >
         <Box
           component="img"
-          src="/assets/img/logo.png"
+          src={logo}
           alt="Logo"
           sx={{
             width: 80,
