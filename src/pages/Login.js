@@ -1,121 +1,227 @@
 // src/components/Login.js
 
-import React, { useState } from 'react';
-import axios from 'axios';
+import React, { useState } from "react";
+import axios from "axios";
+import {
+    Box,
+    Paper,
+    Typography,
+    TextField,
+    Button,
+    InputAdornment,
+    useTheme,
+    Alert,
+} from "@mui/material";
+import { styled } from "@mui/system";
+import PersonIcon from "@mui/icons-material/Person";
+import LockIcon from "@mui/icons-material/Lock";
+import roupaImg from "../assets/img/roupa.png";
+
 const url = process.env.REACT_APP_API_URL ? process.env.REACT_APP_API_URL : "";
 
-const Login = () => {
-  // Estados para armazenar email, senha e mensagens
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+// Container geral, fundo amarelo pastel
+const Container = styled("div")(({ theme }) => ({
+    display: "flex",
+    minHeight: "100vh",
+    backgroundColor: "#f7f7dc", // amarelo pastel leve, ajuste conforme necessário
+    alignItems: "center",
+    justifyContent: "center",
+}));
 
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+// Caixa da esquerda onde fica o formulário
+const FormCard = styled(Paper)(({ theme }) => ({
+    width: "50%",
+    maxWidth: "450px",
+    height: "410px",
+    backgroundColor: "#fdfbe7", // um off-white/amarelo bem claro para destacar do fundo
+    padding: theme.spacing(4),
+    borderRadius: "8px 0px 0px 8px",
+    boxShadow: "0 0 20px rgba(0,0,0,0.1)",
+    position: "relative",
+    zIndex: 2, // fica acima da imagem
+    [theme.breakpoints.down("md")]: {
+        width: "90%",
+    },
+}));
 
-  // Função para lidar com o envio do formulário
-  const handleSubmit = async (e) => {
-    e.preventDefault(); // Previne o comportamento padrão do formulário
-    setError('');
-    setSuccess('');
+// Seção da direita com a imagem
+const Image = styled(Box)(({ theme }) => ({
+    width: "506px",
+    height: "100%",
+    // backgroundColor: "#444444",
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+    borderRadius: "0 8px 8px 0",
+    [theme.breakpoints.down("md")]: {
+        display: "none",
+    },
+}));
 
-    try {
-      // Envia uma requisição POST para /api/sign com email e senha
-      const response = await axios.post(
-        url + '/api/sign',
-        { email, password },
-        { withCredentials: true } // Importante para enviar e receber cookies
-      );
+export default function Login() {
+    const theme = useTheme();
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [error, setError] = useState("");
+    const [success, setSuccess] = useState("");
 
-      if (response.status === 200) {
-        setSuccess('Login realizado com sucesso!');
-        window.location = '/'
-        // Redirecionar o usuário ou atualizar o estado da aplicação conforme necessário
-      }
-    } catch (err) {
-      if (err.response) {
-        // Erro retornado pelo servidor
-        setError(err.response.data.message || 'Falha no login.');
-      } else {
-        // Erro de rede ou outro erro inesperado
-        setError('Ocorreu um erro. Por favor, tente novamente.');
-      }
-    }
-  };
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setError("");
+        setSuccess("");
 
-  return (
-    <div style={styles.container}>
-      <h2>Login</h2>
-      {error && <p style={styles.error}>{error}</p>}
-      {success && <p style={styles.success}>{success}</p>}
-      <form onSubmit={handleSubmit} style={styles.form}>
-        <div style={styles.inputGroup}>
-          <label htmlFor="email">Email:</label>
-          <input
-            type="email"
-            id="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            style={styles.input}
-          />
-        </div>
-        <div style={styles.inputGroup}>
-          <label htmlFor="password">Senha:</label>
-          <input
-            type="password"
-            id="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            style={styles.input}
-          />
-        </div>
-        <button type="submit" style={styles.button}>Login</button>
-      </form>
-    </div>
-  );
-};
+        try {
+            const response = await axios.post(
+                url + "/api/sign",
+                { email, password },
+                { withCredentials: true }
+            );
 
-// Estilos simples para o componente
-const styles = {
-  container: {
-    maxWidth: '400px',
-    margin: '50px auto',
-    padding: '20px',
-    border: '1px solid #ccc',
-    borderRadius: '5px',
-    textAlign: 'center',
-    fontFamily: 'Arial, sans-serif'
-  },
-  form: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '15px'
-  },
-  inputGroup: {
-    display: 'flex',
-    flexDirection: 'column',
-    textAlign: 'left'
-  },
-  input: {
-    padding: '8px',
-    fontSize: '16px'
-  },
-  button: {
-    padding: '10px',
-    fontSize: '16px',
-    backgroundColor: '#28a745',
-    color: 'white',
-    border: 'none',
-    borderRadius: '5px',
-    cursor: 'pointer'
-  },
-  error: {
-    color: 'red'
-  },
-  success: {
-    color: 'green'
-  }
-};
+            if (response.status === 200) {
+                setSuccess("Login realizado com sucesso!");
+                window.location = "/";
+            }
+        } catch (err) {
+            if (err.response) {
+                setError(err.response.data.message || "Falha no login.");
+            } else {
+                setError("Ocorreu um erro. Por favor, tente novamente.");
+            }
+        }
+    };
+    console.log(roupaImg);
+    return (
+        <Container>
+            <FormCard elevation={0} sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              textAlign: 'center',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+                <Typography
+                    variant="h3"
+                    component="h1"
+                    sx={{
+                        fontSize: '36px',
+                        mb: 4,
+                        fontFamily: "Montserrat, sans-serif",
+                        fontWeight: 700,
+                    }}
+                >
+                    Login
+                </Typography>
+                {error && (
+                    <Alert severity="error" sx={{ mb: 2 }}>
+                        {error}
+                    </Alert>
+                )}
+                {success && (
+                    <Alert severity="success" sx={{ mb: 2 }}>
+                        {success}
+                    </Alert>
+                )}
+                <Box
+                    component="form"
+                    onSubmit={handleSubmit}
+                    width="300px"
+                    sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: 5,
+                        alignItems: "center",
+                    }}
+                >
+                    <TextField
+                        variant="outlined"
+                        placeholder="Email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        fullWidth
+                        required
+                        InputProps={{
+                            startAdornment: (
+                                <InputAdornment position="start">
+                                    <PersonIcon sx={{ color: "#000" }} />
+                                </InputAdornment>
+                            ),
+                        }}
+                        sx={{
 
-export default Login;
+                          "& .MuiOutlinedInput-root": {
+                              height: "32px",
+                              borderRadius: "8px",
+                              backgroundColor: '#F7E9B6',
+                              // Cor padrão da borda
+                              "& fieldset": {
+                                borderColor: "#F7E9B6",
+                              },
+                              // Cor quando está ativo/focado
+                              "&.Mui-focused fieldset": {
+                                borderColor: "#222", // Substitua pela cor desejada
+                                borderWidth: "2px", // Pode ajustar a espessura se necessário
+                              },
+                            },
+                          }}
+                          />
+
+                    <TextField
+                        variant="outlined"
+                        placeholder="Senha"
+                        type="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        fullWidth
+                        required
+                        InputProps={{
+                          startAdornment: (
+                            <InputAdornment position="start">
+                                    <LockIcon sx={{ color: "#000" }} />
+                                </InputAdornment>
+                            ),
+                          }}
+                          sx={{
+                            
+                            "& .MuiOutlinedInput-root": {
+                                height: "32px",
+                                borderRadius: "8px",
+                                backgroundColor: '#F7E9B6',
+                                // Cor padrão da borda
+                                "& fieldset": {
+                                    borderColor: "#F7E9B6",
+                                },
+                                // Cor quando está ativo/focado
+                                "&.Mui-focused fieldset": {
+                                    borderColor: "#222", // Substitua pela cor desejada
+                                    borderWidth: "2px", // Pode ajustar a espessura se necessário
+                                },
+                            },
+                        }}
+                    />
+
+                    <Button
+                        type="submit"
+                        variant="contained"
+                        sx={{
+                            width: "200px",
+                            py: 0,
+                            fontFamily: "Montserrat, sans-serif",
+                            fontSize: "1.4rem",
+                            fontWeight: 700,
+                            textTransform: "none",
+                            backgroundColor: "#F8CA41", // amarelo mais vivo
+                            color: "#000", // texto preto
+                            borderRadius: "8px",
+                            "&:hover": {
+                                backgroundColor: "#F8CA41", // um tom mais escuro
+                            },
+                        }}
+                    >
+                        Log in
+                    </Button>
+                </Box>
+            </FormCard>
+
+            <Image component="img" src={roupaImg} alt="Imagem de roupa" />
+        </Container>
+    );
+}
