@@ -80,7 +80,7 @@ const UserForm = ({ open, onClose, mode, formData, onSave }) => {
                         required
                     />
                     <TextField
-                        label="Senha"
+                        label={mode === "create" ? "Senha" : "Nova Senha"}
                         name="password"
                         type="password"
                         value={data.password}

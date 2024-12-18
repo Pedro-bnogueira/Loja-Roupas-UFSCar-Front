@@ -238,19 +238,32 @@ function UserList() {
                                             <TableCell>{usr.accessLevel}</TableCell>
                                             <TableCell align="center">
                                                 <IconButton
+                                                    color="primary"
+                                                    sx={{
+                                                      backgroundColor: "#b3f1ba", 
+                                                      marginRight: 1,
+                                                      "&:hover": {
+                                                        backgroundColor: "#8ade93",
+                                                      }
+                                                    }}
+                                                    onClick={() => handleEditClick(usr)}
+                                                >
+                                                    <EditIcon />
+                                                </IconButton>
+                                                <IconButton
                                                     color="error"
+                                                    sx={{
+                                                      backgroundColor: "#f9b5b5", 
+                                                      "&:hover": {
+                                                        backgroundColor: "#f28a8a",
+                                                      }
+                                                    }}
                                                     onClick={() => {
                                                         setSelectedUserId(usr.id);
                                                         setOpenDeleteDialog(true);
                                                     }}
                                                 >
                                                     <DeleteIcon />
-                                                </IconButton>
-                                                <IconButton
-                                                    color="primary"
-                                                    onClick={() => handleEditClick(usr)}
-                                                >
-                                                    <EditIcon />
                                                 </IconButton>
                                             </TableCell>
                                         </TableRow>
