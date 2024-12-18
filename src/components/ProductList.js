@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Box, Typography, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Button, IconButton, Snackbar, Alert } from "@mui/material";
+import {
+  Box, Typography, Paper, Table, TableBody, TableCell, TableContainer,
+  TableHead, TableRow, Button, IconButton, Snackbar, Alert
+} from "@mui/material";
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import AddIcon from '@mui/icons-material/Add';
 import { styled } from '@mui/system';
-import ProductForm from "../../components/ProductForm";
-import DeleteDialog from "../../components/DeleteDialog";
+import ProductForm from "./ProductForm";
+import DeleteDialog from "./DeleteDialog";
 
 const url = process.env.REACT_APP_API_URL ? process.env.REACT_APP_API_URL : "";
 
@@ -21,14 +25,16 @@ const HeaderBox = styled('div')(({ theme }) => ({
 
 export default function ProductList() {
   const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]); // Armazenar categorias para o select
   const [openFormDialog, setOpenFormDialog] = useState(false);
   const [formMode, setFormMode] = useState("create");
   const [formData, setFormData] = useState({
-    code: "",
     name: "",
-    category: "",
+    brand: "",
     price: "",
-    stock: "",
+    size: "",
+    color: "",
+    categoryName: ""
   });
   const [selectedProductId, setSelectedProductId] = useState(null);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
@@ -39,8 +45,8 @@ export default function ProductList() {
   });
 
   useEffect(() => {
-    // Carregar a lista de produtos do backend
     fetchProducts();
+    fetchCategories();
   }, []);
 
   const fetchProducts = async () => {
@@ -54,14 +60,28 @@ export default function ProductList() {
     }
   };
 
+  const fetchCategories = async () => {
+    try {
+      const response = await axios.get(`${url}/api/get/categories`, { withCredentials: true });
+      if (response.status === 200 && response.data.categories) {
+        setCategories(response.data.categories);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  console.log(categories)
+
   const handleCreateClick = () => {
     setFormMode("create");
     setFormData({
-      code: "",
       name: "",
-      category: "",
+      brand: "",
       price: "",
-      stock: "",
+      size: "",
+      color: "",
+      categoryName: ""
     });
     setOpenFormDialog(true);
   };
@@ -69,20 +89,43 @@ export default function ProductList() {
   const handleEditClick = (product) => {
     setFormMode("edit");
     setSelectedProductId(product.id);
+
+    // Verifica se existe categoria
+    const currentCategoryName = product.category ? product.category.name : "";
+
     setFormData({
-      code: product.code || "",
       name: product.name || "",
-      category: product.category || "",
+      brand: product.brand || "",
       price: product.price || "",
-      stock: product.stock || "",
+      size: product.size || "",
+      color: product.color || "",
+      categoryName: currentCategoryName,
     });
     setOpenFormDialog(true);
   };
 
   const handleSaveProduct = async (data) => {
     try {
+      // Aqui transformaremos o categoryName em categoryId
+      let categoryId = null;
+      if (data.categoryName) {
+        const foundCategory = categories.find(cat => cat.name === data.categoryName);
+        if (foundCategory) {
+          categoryId = foundCategory.id;
+        }
+      }
+
+      const payload = {
+        name: data.name,
+        brand: data.brand,
+        price: data.price,
+        size: data.size,
+        color: data.color,
+        category: data.categoryName
+      };
+
       if (formMode === "create") {
-        const response = await axios.post(`${url}/api/new/product`, data, { withCredentials: true });
+        const response = await axios.post(`${url}/api/new/product`, payload, { withCredentials: true });
         if (response.status === 201 && response.data.product) {
           setProducts([...products, response.data.product]);
           setOpenFormDialog(false);
@@ -91,7 +134,7 @@ export default function ProductList() {
           handleSnackbarOpen("Erro ao cadastrar produto.", "error");
         }
       } else {
-        const response = await axios.put(`${url}/edit/product/${selectedProductId}`, data, { withCredentials: true });
+        const response = await axios.put(`${url}/api/update/product/${selectedProductId}`, payload, { withCredentials: true });
         if (response.status === 200 && response.data.product) {
           setProducts(products.map((p) => p.id === selectedProductId ? { ...p, ...response.data.product } : p));
           setOpenFormDialog(false);
@@ -143,21 +186,22 @@ export default function ProductList() {
   };
 
   return (
-    <Box sx={{ marginTop: 10, paddingX: 2 }}>
+    <>
       <HeaderBox>
         <Typography variant="h4" sx={{ fontWeight: 700, fontFamily: 'Montserrat, sans-serif' }}>
           Produtos cadastrados
         </Typography>
         <Button
           variant="contained"
-          color="success"
+          color="primary"
           onClick={handleCreateClick}
           sx={{
             fontWeight: 600,
             textTransform: "none"
           }}
+          startIcon={<AddIcon />}
         >
-          Adicionar produto +
+          Adicionar produto
         </Button>
       </HeaderBox>
 
@@ -166,27 +210,31 @@ export default function ProductList() {
           <Table aria-label="Tabela de Produtos">
             <TableHead>
               <TableRow>
-                <TableCell><strong>Código</strong></TableCell>
+                <TableCell><strong>ID</strong></TableCell>
                 <TableCell><strong>Nome</strong></TableCell>
-                <TableCell><strong>Categoria</strong></TableCell>
+                <TableCell><strong>Marca</strong></TableCell>
                 <TableCell><strong>Preço</strong></TableCell>
-                <TableCell><strong>Estoque</strong></TableCell>
+                <TableCell><strong>Tamanho</strong></TableCell>
+                <TableCell><strong>Cor</strong></TableCell>
+                <TableCell><strong>Categoria</strong></TableCell>
                 <TableCell><strong>Ações</strong></TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {products.map((p, index) => (
+              {products.map((p) => (
                 <TableRow key={p.id}>
-                  <TableCell>{p.code}</TableCell>
+                  <TableCell>{p.id}</TableCell>
                   <TableCell>{p.name}</TableCell>
-                  <TableCell>{p.category}</TableCell>
+                  <TableCell>{p.brand}</TableCell>
                   <TableCell>R$ {parseFloat(p.price).toFixed(2)}</TableCell>
-                  <TableCell>{p.stock}</TableCell>
+                  <TableCell>{p.size}</TableCell>
+                  <TableCell>{p.color}</TableCell>
+                  <TableCell>{p.category ? p.category.name : ""}</TableCell>
                   <TableCell>
                     <IconButton
                       color="primary"
                       sx={{
-                        backgroundColor: "#b3f1ba", // verde claro para edit
+                        backgroundColor: "#b3f1ba", 
                         marginRight: 1,
                         "&:hover": {
                           backgroundColor: "#8ade93",
@@ -199,7 +247,7 @@ export default function ProductList() {
                     <IconButton
                       color="error"
                       sx={{
-                        backgroundColor: "#f9b5b5", // vermelho claro para delete
+                        backgroundColor: "#f9b5b5", 
                         "&:hover": {
                           backgroundColor: "#f28a8a",
                         }
@@ -211,6 +259,13 @@ export default function ProductList() {
                   </TableCell>
                 </TableRow>
               ))}
+              {products.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={8} align="center">
+                    Nenhum produto cadastrado.
+                  </TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         </TableContainer>
@@ -223,6 +278,7 @@ export default function ProductList() {
         mode={formMode}
         formData={formData}
         onSave={handleSaveProduct}
+        categories={categories} // Passando as categorias para o form
       />
 
       {/* Diálogo de confirmação para exclusão */}
@@ -249,6 +305,6 @@ export default function ProductList() {
           {snackbar.message}
         </Alert>
       </Snackbar>
-    </Box>
+    </>
   );
 }

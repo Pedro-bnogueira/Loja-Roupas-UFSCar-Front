@@ -1,9 +1,8 @@
-// src/components/ProductForm.js
-
 import React, { useState, useEffect } from "react";
-import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, Box } from "@mui/material";
+import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, Box, FormControl, InputLabel, Select, MenuItem } from "@mui/material";
+import PriceField from "../utils/formatMonetary";
 
-const ProductForm = ({ open, onClose, mode, formData, onSave }) => {
+const ProductForm = ({ open, onClose, mode, formData, onSave, categories }) => {
     const [data, setData] = useState({ ...formData });
     const [errors, setErrors] = useState({});
 
@@ -19,11 +18,11 @@ const ProductForm = ({ open, onClose, mode, formData, onSave }) => {
 
     const validate = () => {
         let tempErrors = {};
-        if (!data.code.trim()) tempErrors.code = "O código é obrigatório.";
         if (!data.name.trim()) tempErrors.name = "O nome é obrigatório.";
-        if (!data.category.trim()) tempErrors.category = "A categoria é obrigatória.";
+        if (!data.brand.trim()) tempErrors.brand = "A marca é obrigatória.";
         if (!data.price || isNaN(data.price)) tempErrors.price = "O preço é obrigatório e deve ser um número.";
-        if (!data.stock || isNaN(data.stock)) tempErrors.stock = "O estoque é obrigatório e deve ser um número.";
+        if (!data.size.trim()) tempErrors.size = "O tamanho é obrigatório.";
+        if (!data.color.trim()) tempErrors.color = "A cor é obrigatória.";
 
         setErrors(tempErrors);
         return Object.keys(tempErrors).length === 0;
@@ -52,16 +51,6 @@ const ProductForm = ({ open, onClose, mode, formData, onSave }) => {
                     autoComplete="off"
                 >
                     <TextField
-                        label="Código"
-                        name="code"
-                        value={data.code}
-                        onChange={handleChange}
-                        fullWidth
-                        error={!!errors.code}
-                        helperText={errors.code}
-                        required
-                    />
-                    <TextField
                         label="Nome"
                         name="name"
                         value={data.name}
@@ -72,37 +61,58 @@ const ProductForm = ({ open, onClose, mode, formData, onSave }) => {
                         required
                     />
                     <TextField
-                        label="Categoria"
-                        name="category"
-                        value={data.category}
+                        label="Marca"
+                        name="brand"
+                        value={data.brand}
                         onChange={handleChange}
                         fullWidth
-                        error={!!errors.category}
-                        helperText={errors.category}
+                        error={!!errors.brand}
+                        helperText={errors.brand}
+                        required
+                    />
+                    <PriceField
+                        data={data}
+                        handleChange={handleChange}
+                        errors={errors}
+                    />
+                    <TextField
+                        label="Tamanho"
+                        name="size"
+                        value={data.size}
+                        onChange={handleChange}
+                        fullWidth
+                        error={!!errors.size}
+                        helperText={errors.size}
                         required
                     />
                     <TextField
-                        label="Preço"
-                        name="price"
-                        type="number"
-                        value={data.price}
+                        label="Cor"
+                        name="color"
+                        value={data.color}
                         onChange={handleChange}
                         fullWidth
-                        error={!!errors.price}
-                        helperText={errors.price}
+                        error={!!errors.color}
+                        helperText={errors.color}
                         required
                     />
-                    <TextField
-                        label="Estoque"
-                        name="stock"
-                        type="number"
-                        value={data.stock}
-                        onChange={handleChange}
-                        fullWidth
-                        error={!!errors.stock}
-                        helperText={errors.stock}
-                        required
-                    />
+
+                    {/* Campo de seleção de categoria */}
+                    <FormControl fullWidth>
+                        <InputLabel>Categoria</InputLabel>
+                        <Select
+                            name="categoryName"
+                            value={data.categoryName}
+                            label="Categoria"
+                            onChange={handleChange}
+                        >
+                            <MenuItem value="">Sem categoria</MenuItem>
+                            {categories.map(cat => (
+                                <MenuItem key={cat.id} value={cat.name}>
+                                    {cat.name}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
                 </Box>
             </DialogContent>
             <DialogActions>
