@@ -70,7 +70,7 @@ export default function AppMenu({ open, setOpen }) {
           }}
         />
         <Typography variant="h6" component="div">
-          Trupe da diária app
+          Loja de Roupas UFSCar
         </Typography>
       </Box>
 
