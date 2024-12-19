@@ -1,6 +1,20 @@
 import React, { useState, useEffect } from "react";
-import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, Box, FormControl, InputLabel, Select, MenuItem } from "@mui/material";
+import {
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
+    TextField,
+    Button,
+    Box,
+    FormControl,
+    InputLabel,
+    Select,
+    MenuItem,
+} from "@mui/material";
 import PriceField from "../utils/formatMonetary";
+import { NumericFormat } from 'react-number-format';
+
 
 const ProductForm = ({ open, onClose, mode, formData, onSave, categories }) => {
     const [data, setData] = useState({ ...formData });
@@ -70,10 +84,25 @@ const ProductForm = ({ open, onClose, mode, formData, onSave, categories }) => {
                         helperText={errors.brand}
                         required
                     />
-                    <PriceField
-                        data={data}
-                        handleChange={handleChange}
-                        errors={errors}
+                    <NumericFormat
+                        label="Preço"
+                        name="price"
+                        value={data.price}
+                        fullWidth
+                        customInput={TextField}
+                        decimalScale={2} // quantas casas decimais
+                        fixedDecimalScale={true} // mantém sempre duas casas decimais
+                        thousandSeparator="." // separador de milhares
+                        decimalSeparator="," // separador decimal
+                        prefix="R$ " // prefixo do valor
+                        onValueChange={(values) => {
+                            const { floatValue } = values;
+                            // Atualiza o estado com o valor numérico puro (floatValue)
+                            setData({ ...data, price: floatValue });
+                        }}
+                        error={!!errors.price}
+                        helperText={errors.price}
+                        required
                     />
                     <TextField
                         label="Tamanho"
@@ -106,7 +135,7 @@ const ProductForm = ({ open, onClose, mode, formData, onSave, categories }) => {
                             onChange={handleChange}
                         >
                             <MenuItem value="">Sem categoria</MenuItem>
-                            {categories.map(cat => (
+                            {categories.map((cat) => (
                                 <MenuItem key={cat.id} value={cat.name}>
                                     {cat.name}
                                 </MenuItem>
@@ -119,7 +148,11 @@ const ProductForm = ({ open, onClose, mode, formData, onSave, categories }) => {
                 <Button onClick={onClose} color="primary">
                     Cancelar
                 </Button>
-                <Button onClick={handleSubmit} variant="contained" color="primary">
+                <Button
+                    onClick={handleSubmit}
+                    variant="contained"
+                    color="primary"
+                >
                     {mode === "create" ? "Adicionar" : "Salvar"}
                 </Button>
             </DialogActions>

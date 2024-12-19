@@ -92,7 +92,7 @@ export default function ProductList() {
     setSelectedProductId(product.id);
 
     // Verifica se existe categoria
-    const currentCategoryName = product.category ? product.category.name : "teste";
+    const currentCategoryName = product.category ? product.category.name : "";
 
     setFormData({
       name: product.name || "",
@@ -115,11 +115,11 @@ export default function ProductList() {
           categoryId = foundCategory.id;
         }
       }
-      const formatedPrice = formatMoneyToFloat(data.price)
+      console.log(data.price)
       const payload = {
         name: data.name,
         brand: data.brand,
-        price: formatedPrice,
+        price: data.price,
         size: data.size,
         color: data.color,
         category: data.categoryName
@@ -136,8 +136,8 @@ export default function ProductList() {
         }
       } else {
         const response = await axios.put(`${url}/api/update/product/${selectedProductId}`, payload, { withCredentials: true });
-        if (response.status === 200 && response.data.product) {
-          setProducts(products.map((p) => p.id === selectedProductId ? { ...p, ...response.data.product } : p));
+        if (response.status === 200 && response.data.editedProduct) {
+          setProducts(products.map((p) => p.id === selectedProductId ? { ...p, ...response.data.editedProduct } : p));
           setOpenFormDialog(false);
           handleSnackbarOpen("Produto atualizado com sucesso!", "success");
         } else {
