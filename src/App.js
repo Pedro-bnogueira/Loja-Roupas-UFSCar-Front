@@ -7,6 +7,10 @@ import Login from "./pages/Login";
 import Home from "./pages/Home";
 import UserList from "./pages/Users/UserList";
 import ProductsAndCategories from './pages/Products/ProductAndCategories';
+import InventoryAndTransactions from './pages/Inventory/InventoryAndTransactions';
+
+// função temporaria "em construção"
+import Building from "./pages/Building";
 
 function App() {
   return (
@@ -16,8 +20,10 @@ function App() {
             <Routes>
               <Route path="/login" element={<Login />} />
               <Route path="/" element={<Home />}>
+                <Route path="/" element={<Building />} />
                 <Route path="adm/users" element={<UserList />} />
                 <Route path="/products" element={<ProductsAndCategories />} />
+                <Route path="/estoque" element={<InventoryAndTransactions />} />
               </Route>
             </Routes>
           </div>
