@@ -14,12 +14,14 @@ import HomeIcon from '@mui/icons-material/Home';
 import PeopleIcon from '@mui/icons-material/People'; 
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import StorefrontIcon from '@mui/icons-material/Storefront';
+import Inventory2Icon from '@mui/icons-material/Inventory2';
 import { AuthContext } from '../context/AuthContext';
 import logo from '../assets/img/logo.png'
 
 const menuItems = [
   { text: 'Início', icon: <HomeIcon />, link: '/' },
   { text: 'Produtos', icon: <StorefrontIcon />, link: '/products', adminOnly: false },
+  { text: 'Estoque', icon: <Inventory2Icon />, link: '/estoque', adminOnly: false },
   { text: 'Administração', icon: <AdminPanelSettingsIcon />, link: '/adm/users', adminOnly: true },
 ];
 
@@ -62,8 +64,8 @@ export default function AppMenu({ open, setOpen }) {
           src={logo}
           alt="Logo"
           sx={{
-            width: 80,
-            height: 80,
+            width: 100,
+            height: 100,
             borderRadius: '50%',
             objectFit: 'cover',
             marginBottom: 1,
