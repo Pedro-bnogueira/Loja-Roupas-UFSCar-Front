@@ -10,6 +10,7 @@ import AddIcon from '@mui/icons-material/Add';
 import { styled } from '@mui/system';
 import ProductForm from "./ProductForm";
 import DeleteDialog from "./DeleteDialog";
+import { formatMoneyToFloat } from "../utils/formatMoneyToFloat";
 
 const url = process.env.REACT_APP_API_URL ? process.env.REACT_APP_API_URL : "";
 
@@ -91,7 +92,7 @@ export default function ProductList() {
     setSelectedProductId(product.id);
 
     // Verifica se existe categoria
-    const currentCategoryName = product.category ? product.category.name : "";
+    const currentCategoryName = product.category ? product.category.name : "teste";
 
     setFormData({
       name: product.name || "",
@@ -114,11 +115,11 @@ export default function ProductList() {
           categoryId = foundCategory.id;
         }
       }
-
+      const formatedPrice = formatMoneyToFloat(data.price)
       const payload = {
         name: data.name,
         brand: data.brand,
-        price: data.price,
+        price: formatedPrice,
         size: data.size,
         color: data.color,
         category: data.categoryName

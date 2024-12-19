@@ -20,7 +20,7 @@ const ProductForm = ({ open, onClose, mode, formData, onSave, categories }) => {
         let tempErrors = {};
         if (!data.name.trim()) tempErrors.name = "O nome é obrigatório.";
         if (!data.brand.trim()) tempErrors.brand = "A marca é obrigatória.";
-        if (!data.price || isNaN(data.price)) tempErrors.price = "O preço é obrigatório e deve ser um número.";
+        if (!data.price) tempErrors.price = "O preço é obrigatório.";
         if (!data.size.trim()) tempErrors.size = "O tamanho é obrigatório.";
         if (!data.color.trim()) tempErrors.color = "A cor é obrigatória.";
 
