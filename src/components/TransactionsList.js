@@ -1,7 +1,11 @@
-import React from 'react';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import { Box, Typography, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';   // Ícone para Saída
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward'; // Ícone para Entrada
+import { format } from 'date-fns';
+
+const url = process.env.REACT_APP_API_URL ? process.env.REACT_APP_API_URL : "";
 
 // Dados simulados de transações:
 // type: 'in' para entrada, 'out' para saída
@@ -47,7 +51,47 @@ const transactionsData = [
   },
 ];
 
+
+
 export default function TransactionsList() {
+  const [transactions, setTransactions] = useState([]);
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success"
+  });
+
+  useEffect(() => {
+    fetchTransactions();
+  }, []);
+  
+  const fetchTransactions = async () => {
+    try {
+      const response = await axios.get(`${url}/api/get/transactions`, { withCredentials: true });
+      if (response.status === 200 && response.data.transactions) {
+        setTransactions(response.data.transactions);
+      }
+    } catch (error) {
+      console.error(error);
+      handleSnackbarOpen("Erro ao buscar estoque.", "error");
+    }
+  };
+
+  const handleSnackbarOpen = (message, severity = "success") => {
+    setSnackbar({
+      open: true,
+      message,
+      severity,
+    });
+  };
+
+  const handleSnackbarClose = () => {
+    setSnackbar({
+      ...snackbar,
+      open: false,
+    });
+  };
+console.log(transactions)
   return (
     <Box sx={{ paddingX: 2 }}>
       <Typography variant="h4" sx={{ fontWeight: 700, fontFamily: 'Montserrat, sans-serif', mb: 2 }}>
@@ -70,10 +114,11 @@ export default function TransactionsList() {
                 <TableCell><strong>Quantidade</strong></TableCell>
                 <TableCell><strong>Preço da Transação (R$)</strong></TableCell>
                 <TableCell><strong>Data da Transação</strong></TableCell>
+                <TableCell><strong>Usuário Responsável</strong></TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {transactionsData.map((t) => (
+              {transactions.map((t) => (
                 <TableRow key={t.id}>
                   <TableCell>
                     {t.type === 'in' ? (
@@ -84,17 +129,18 @@ export default function TransactionsList() {
                   </TableCell>
                   <TableCell>{t.id}</TableCell>
                   <TableCell>{t.productId}</TableCell>
-                  <TableCell>{t.productName}</TableCell>
-                  <TableCell>{t.brand}</TableCell>
-                  <TableCell>{t.color}</TableCell>
-                  <TableCell>{t.size}</TableCell>
+                  <TableCell>{t.product.name}</TableCell>
+                  <TableCell>{t.product.brand}</TableCell>
+                  <TableCell>{t.product.color}</TableCell>
+                  <TableCell>{t.product.size}</TableCell>
                   <TableCell>{t.supplierOrBuyer}</TableCell>
                   <TableCell>{t.quantity}</TableCell>
-                  <TableCell>R$ {parseFloat(t.price).toFixed(2)}</TableCell>
-                  <TableCell>{t.date}</TableCell>
+                  <TableCell>R$ {parseFloat(t.transactionPrice).toFixed(2)}</TableCell>
+                  <TableCell>{format(new Date(t.transactionDate), 'dd/MM/yyyy HH:mm:ss')}</TableCell>
+                  <TableCell>{t.user.name}</TableCell>
                 </TableRow>
               ))}
-              {transactionsData.length === 0 && (
+              {transactions.length === 0 && (
                 <TableRow>
                   <TableCell colSpan={11} align="center">
                     Nenhuma transação registrada.

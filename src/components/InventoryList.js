@@ -1,24 +1,34 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Box, Typography, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, IconButton, Tooltip } from '@mui/material';
+import { 
+  Box, Typography, Paper, Table, TableBody, TableCell, 
+  TableContainer, TableHead, TableRow, IconButton, Tooltip, 
+  Button, Stack, Snackbar, Alert 
+} from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
+import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
+import LocalMallIcon from '@mui/icons-material/LocalMall';
+
+import TransactionForm from "./TransactionForm";
+import DeleteDialog from "./DeleteDialog"; // Se você quiser permitir deletar transações ou estoque
+import { formatMoneyToFloat } from "../utils/formatMoneyToFloat"; // Certifique-se que esta função está correta
 
 const url = process.env.REACT_APP_API_URL ? process.env.REACT_APP_API_URL : "";
 
-// Dados simulados de estoque:
-const inventoryData = [
-  { id: 1, name: 'Camiseta Básica', brand: 'Marca X', color: 'Preto', size: 'M', stockQuantity: 100, price: 29.90 },
-  { id: 2, name: 'Calça Jeans', brand: 'Marca Y', color: 'Azul', size: '42', stockQuantity: 50, price: 89.90 },
-  { id: 3, name: 'Jaqueta de Couro', brand: 'Marca Z', color: 'Marrom', size: 'G', stockQuantity: 10, price: 199.90 },
-];
-
-// Cálculo do valor de estoque: quantidade * preço
-// Isso pode ser alterado conforme a lógica necessária.
 export default function InventoryList() {
   const [inventory, setInventory] = useState([]);
+  const [products, setProducts] = useState([]);
+  const [openTransactionForm, setOpenTransactionForm] = useState(false);
+  const [transactionType, setTransactionType] = useState("in"); // 'in' (compra) ou 'out' (venda)
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success"
+  });
 
   useEffect(() => {
     fetchInventory();
+    fetchProducts();
   }, []);
   
   const fetchInventory = async () => {
@@ -29,15 +39,97 @@ export default function InventoryList() {
       }
     } catch (error) {
       console.error(error);
+      handleSnackbarOpen("Erro ao buscar estoque.", "error");
     }
   };
 
-  console.log(inventory)
+  const fetchProducts = async () => {
+    try {
+      const response = await axios.get(`${url}/api/get/products`, { withCredentials: true });
+      if (response.status === 200 && response.data.products) {
+        setProducts(response.data.products);
+      }
+    } catch (error) {
+      console.error(error);
+      handleSnackbarOpen("Erro ao buscar produtos.", "error");
+    }
+  };
+
+  // Abre o formulário de transação (compra ou venda)
+  const handleOpenTransactionForm = (type) => {
+    setTransactionType(type);
+    setOpenTransactionForm(true);
+  };
+
+  // Fecha o formulário de transação
+  const handleCloseTransactionForm = () => {
+    setOpenTransactionForm(false);
+  };
+
+  // Ao salvar a transação, atualizamos o estoque local
+  const handleSaveTransaction = (newTransaction) => {
+    const { type, productId, quantity } = newTransaction;
+
+    // Atualiza o estoque local
+    const updatedInventory = inventory.map(item => {
+      if (item.productId === productId) {
+        const updatedQuantity = type === 'in'
+          ? item.quantity + quantity
+          : item.quantity - quantity;
+        return { ...item, quantity: updatedQuantity };
+      }
+      return item;
+    });
+    setInventory(updatedInventory);
+
+    // Mostra feedback
+    handleSnackbarOpen(`Transação de ${type === 'in' ? 'compra' : 'venda'} registrada com sucesso!`, "success");
+
+    // Fecha o modal
+    setOpenTransactionForm(false);
+  };
+
+  const handleSnackbarOpen = (message, severity = "success") => {
+    setSnackbar({
+      open: true,
+      message,
+      severity,
+    });
+  };
+
+  const handleSnackbarClose = () => {
+    setSnackbar({
+      ...snackbar,
+      open: false,
+    });
+  };
+
   return (
     <Box sx={{ paddingX: 2 }}>
       <Typography variant="h4" sx={{ fontWeight: 700, fontFamily: 'Montserrat, sans-serif', mb: 2 }}>
         Controle de Estoque
       </Typography>
+
+      {/* Botões para registrar compra e venda */}
+      <Stack direction="row" spacing={2} sx={{ mb: 2 }}>
+        <Button 
+          variant="contained" 
+          color="primary" 
+          startIcon={<AddShoppingCartIcon />}
+          onClick={() => handleOpenTransactionForm("in")}
+        >
+          Registrar Compra
+        </Button>
+
+        <Button 
+          variant="contained" 
+          color="secondary" 
+          startIcon={<LocalMallIcon />}
+          onClick={() => handleOpenTransactionForm("out")}
+        >
+          Registrar Venda
+        </Button>
+      </Stack>
 
       <Paper variant="outlined">
         <TableContainer component={Paper} variant="outlined">
@@ -76,7 +168,7 @@ export default function InventoryList() {
                               backgroundColor: "#8ade93",
                             }
                           }}
-                          onClick={() => alert(`Editar estoque do produto ID ${item.id}`)}
+                          onClick={() => alert(`Editar estoque do produto ID ${item.productId}`)}
                         >
                           <EditIcon />
                         </IconButton>
@@ -85,7 +177,7 @@ export default function InventoryList() {
                   </TableRow>
                 );
               })}
-              {inventoryData.length === 0 && (
+              {inventory.length === 0 && (
                 <TableRow>
                   <TableCell colSpan={8} align="center">
                     Nenhum produto em estoque.
@@ -96,6 +188,32 @@ export default function InventoryList() {
           </Table>
         </TableContainer>
       </Paper>
+
+      {/* Modal para registrar compra/venda */}
+      <TransactionForm
+        open={openTransactionForm}
+        onClose={handleCloseTransactionForm}
+        type={transactionType}  // 'in' ou 'out'
+        products={products}   // Para listar produtos existentes
+        onSave={handleSaveTransaction}
+        setSnackbar={setSnackbar}
+      />
+
+      {/* Snackbar para Feedback */}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert
+          onClose={handleSnackbarClose}
+          severity={snackbar.severity}
+          sx={{ width: "100%" }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 }
