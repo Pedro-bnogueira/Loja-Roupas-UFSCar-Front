@@ -1,4 +1,3 @@
-// src/components/TransactionForm.jsx
 import React, { useState, useEffect } from 'react';
 import { 
   Dialog, DialogTitle, DialogContent, DialogActions, 
@@ -63,16 +62,13 @@ export default function TransactionForm({ open, onClose, type, products, onSave,
         // Atualiza o estado local com a transação retornada pelo backend
         onSave(response.data.transactionHistory);
         
-        // Exemplo: Mostrar um Snackbar de sucesso
+        // Mostrar um Snackbar de sucesso
         setSnackbar({
           open: true,
           message: 'Transação registrada com sucesso!',
           severity: 'success',
         });
   
-        // // Refazer o fetch de estoque ou transações
-        // fetchInventory();
-        // fetchTransactions();
       } else {
         // Tratar erros retornados pelo backend
         setSnackbar({
