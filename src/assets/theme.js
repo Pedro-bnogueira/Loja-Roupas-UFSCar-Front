@@ -14,6 +14,8 @@ const theme = createTheme({
         },
         tertiary: {
             main: "#FFF57E",
+            dark: "#FBC114",
+            dark_hover: "#F0B400",
             constrastText: "#1C1C1C",
         },
     },
