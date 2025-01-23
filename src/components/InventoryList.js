@@ -28,19 +28,22 @@ import EditIcon from "@mui/icons-material/Edit";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import LocalMallIcon from "@mui/icons-material/LocalMall";
 import SearchIcon from "@mui/icons-material/Search";
-
+import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import * as XLSX from "xlsx";
 
 import TransactionForm from "./TransactionForm";
+import ReturnExchangeForm from './ReturnExchangeForm';
 import { formatMoneyToFloat } from "../utils/formatMoneyToFloat"; // Certifique-se que esta função está correta
+import theme from '../assets/theme';
 
 const url = process.env.REACT_APP_API_URL ? process.env.REACT_APP_API_URL : "";
 
 export default function InventoryList() {
     const [inventory, setInventory] = useState([]);
     const [products, setProducts] = useState([]);
+    const [transactions, setTransactions] = useState([]);
     const [filteredInventory, setFilteredInventory] = useState([]); // Para busca e filtro
     const [searchText, setSearchText] = useState(""); // Campo de busca geral
     const [filterField, setFilterField] = useState(""); // Campo/atributo a filtrar
@@ -49,6 +52,7 @@ export default function InventoryList() {
     const [filterOptions, setFilterOptions] = useState([]); // Opções para filterValue
     const [isNumericFilter, setIsNumericFilter] = useState(false); // Identifica se o filtro é numérico
     const [openTransactionForm, setOpenTransactionForm] = useState(false);
+    const [openExchangeForm, setOpenExchangeForm] = useState(false);
     const [transactionType, setTransactionType] = useState("in"); // 'in' (compra) ou 'out' (venda)
     const [snackbar, setSnackbar] = useState({
         open: false,
@@ -60,6 +64,7 @@ export default function InventoryList() {
     useEffect(() => {
         fetchInventory();
         fetchProducts();
+        fetchTransactions();
     }, []);
 
     // Sempre que inventory mudar, atualiza filteredInventory também
@@ -88,6 +93,28 @@ export default function InventoryList() {
             });
             if (response.status === 200 && response.data.products) {
                 setProducts(response.data.products);
+            }
+        } catch (error) {
+            console.error(error);
+            handleSnackbarOpen("Erro ao buscar produtos.", "error");
+        }
+    };
+
+    const fetchTransactions = async () => {
+        try {
+            const response = await axios.get(`${url}/api/get/transactions`, {
+                withCredentials: true,
+            });
+    
+            if (response.status === 200 && response.data.transactions) {
+                // Filtrar transações para incluir somente aquelas do tipo "out"
+                // e que ainda não tiveram devoluções
+                const filteredTransactions = response.data.transactions.filter(
+                    (transaction) =>
+                        transaction.type === "out" && !transaction.isReturned
+                );
+    
+                setTransactions(filteredTransactions);
             }
         } catch (error) {
             console.error(error);
@@ -275,6 +302,14 @@ export default function InventoryList() {
         setOpenTransactionForm(false);
     };
 
+    // Trocas: abrir modal e salvar
+    const handleOpenExchangeForm = () => {
+        setOpenExchangeForm(true);
+    };
+    const handleCloseExchangeForm = () => {
+        setOpenExchangeForm(false);
+    };
+
     const handleSaveTransaction = (newTransaction) => {
         const { type, productId, quantity } = newTransaction;
 
@@ -282,7 +317,7 @@ export default function InventoryList() {
         const updatedInventory = inventory.map((item) => {
             if (item.productId === productId) {
                 const updatedQuantity =
-                    type === "in"
+                    type === "in" || "return"
                         ? item.quantity + quantity
                         : item.quantity - quantity;
                 return { ...item, quantity: updatedQuantity };
@@ -301,6 +336,7 @@ export default function InventoryList() {
 
         // Fecha o modal
         setOpenTransactionForm(false);
+        setOpenExchangeForm(false);
     };
 
     // Funções de Snackbar
@@ -355,6 +391,14 @@ export default function InventoryList() {
                     onClick={() => handleOpenTransactionForm("out")}
                 >
                     Registrar Venda
+                </Button>
+                <Button
+                    variant="contained"
+                    startIcon={<CurrencyExchangeIcon />}
+                    onClick={() => handleOpenExchangeForm()}
+                    sx={{ backgroundColor: theme.palette.tertiary.dark }}
+                >
+                    Trocas e Devoluções
                 </Button>
             </Stack>
 
@@ -548,6 +592,15 @@ export default function InventoryList() {
                 onClose={handleCloseTransactionForm}
                 type={transactionType} // 'in' ou 'out'
                 products={products} // Para listar produtos existentes
+                onSave={handleSaveTransaction}
+                setSnackbar={setSnackbar}
+            />
+
+            {/* Modal para registrar troca/devolucao */}
+            <ExchangeForm
+                open={openExchangeForm}
+                onClose={handleCloseExchangeForm}
+                transactions={transactions} 
                 onSave={handleSaveTransaction}
                 setSnackbar={setSnackbar}
             />

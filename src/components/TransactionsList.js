@@ -25,6 +25,7 @@ import {
 } from "@mui/material";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward"; // Ícone para Saída
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward"; // Ícone para Entrada
+import ReplayIcon from "@mui/icons-material/Replay"; // Ícone para devoluções
 import SearchIcon from "@mui/icons-material/Search";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
@@ -32,50 +33,6 @@ import * as XLSX from "xlsx";
 import { format } from "date-fns";
 
 const url = process.env.REACT_APP_API_URL ? process.env.REACT_APP_API_URL : "";
-
-// Dados simulados de transações:
-// type: 'in' para entrada, 'out' para saída
-const transactionsData = [
-    {
-        id: 1,
-        type: "in",
-        productId: 1,
-        productName: "Camiseta Básica",
-        brand: "Marca X",
-        color: "Preto",
-        size: "M",
-        supplierOrBuyer: "Fornecedor ABC",
-        quantity: 20,
-        price: 29.9, // preço total da transação
-        date: "2023-10-05 14:30",
-    },
-    {
-        id: 2,
-        type: "out",
-        productId: 2,
-        productName: "Calça Jeans",
-        brand: "Marca Y",
-        color: "Azul",
-        size: "42",
-        supplierOrBuyer: "Cliente Fulano",
-        quantity: 5,
-        price: 89.9,
-        date: "2023-10-06 10:00",
-    },
-    {
-        id: 3,
-        type: "in",
-        productId: 3,
-        productName: "Jaqueta de Couro",
-        brand: "Marca Z",
-        color: "Marrom",
-        size: "G",
-        supplierOrBuyer: "Fornecedor XYZ",
-        quantity: 2,
-        price: 399.8, // supondo que cada uma custa 199.90
-        date: "2023-10-07 09:20",
-    },
-];
 
 export default function TransactionsList() {
     const [transactions, setTransactions] = useState([]);
@@ -173,10 +130,7 @@ export default function TransactionsList() {
             if (value !== null) {
                 if (field === "transactionDate") {
                     // Apenas armazena a data formatada no conjunto
-                    const formattedDate = format(
-                        new Date(value),
-                        "dd/MM/yyyy"
-                    );
+                    const formattedDate = format(new Date(value), "dd/MM/yyyy");
                     optionsSet.add(formattedDate);
                 } else {
                     const normalizedValue = value.toString().trim();
@@ -292,7 +246,12 @@ export default function TransactionsList() {
                 new Date(item.transactionDate),
                 "dd/MM/yyyy HH:mm:ss"
             );
-            const typeIcon = item.type === "in" ? "Entrada" : "Saída";
+            const typeIcon =
+                item.type === "in"
+                    ? "Entrada"
+                    : item.type === "out"
+                    ? "Saída"
+                    : "Devolução";
             return [
                 typeIcon,
                 item.id,
@@ -358,7 +317,12 @@ export default function TransactionsList() {
                     new Date(item.transactionDate),
                     "dd/MM/yyyy HH:mm:ss"
                 );
-                const typeIcon = item.type === "in" ? "Entrada" : "Saída";
+                const typeIcon =
+                    item.type === "in"
+                        ? "Entrada"
+                        : item.type === "out"
+                        ? "Saída"
+                        : "Devolução";
                 return [
                     typeIcon,
                     item.id,
@@ -559,47 +523,80 @@ export default function TransactionsList() {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {filteredTransactions.map((t) => (
-                                <TableRow key={t.id}>
-                                    <TableCell>
-                                        {t.type === "in" ? (
-                                            <ArrowDownwardIcon
-                                                sx={{ color: "green" }}
-                                                titleAccess="Entrada"
-                                            />
-                                        ) : (
-                                            <ArrowUpwardIcon
-                                                sx={{ color: "red" }}
-                                                titleAccess="Saída"
-                                            />
-                                        )}
-                                    </TableCell>
-                                    <TableCell>{t.id}</TableCell>
-                                    <TableCell>{t.productId}</TableCell>
-                                    <TableCell>{t.product.name}</TableCell>
-                                    <TableCell>{t.product.brand}</TableCell>
-                                    <TableCell>{t.product.color}</TableCell>
-                                    <TableCell>{t.product.size}</TableCell>
-                                    <TableCell>{t.supplierOrBuyer}</TableCell>
-                                    <TableCell>{t.quantity}</TableCell>
-                                    <TableCell>
-                                        R${" "}
-                                        {parseFloat(t.transactionPrice).toFixed(
-                                            2
-                                        )}
-                                    </TableCell>
-                                    <TableCell>
-                                        {format(
-                                            new Date(t.transactionDate),
-                                            "dd/MM/yyyy HH:mm:ss"
-                                        )}
-                                    </TableCell>
-                                    <TableCell>{t.user.name}</TableCell>
-                                </TableRow>
-                            ))}
+                            {filteredTransactions.map((t) => {
+                                // Determinar o ícone e a cor com base no tipo
+                                let IconComponent;
+                                let iconColor;
+                                let typeLabel;
+
+                                switch (t.type) {
+                                    case "in":
+                                        IconComponent = ArrowDownwardIcon;
+                                        iconColor = "green";
+                                        typeLabel = "Entrada";
+                                        break;
+                                    case "out":
+                                        IconComponent = ArrowUpwardIcon;
+                                        iconColor = "red";
+                                        typeLabel = "Saída";
+                                        break;
+                                    case "return":
+                                        IconComponent = ReplayIcon;
+                                        iconColor = "orange"; // Escolha a cor que preferir
+                                        typeLabel = "Devolução";
+                                        break;
+                                    default:
+                                        IconComponent = null;
+                                        typeLabel = "Desconhecido";
+                                }
+
+                                return (
+                                    <TableRow key={t.id}>
+                                        <TableCell>
+                                            {IconComponent ? (
+                                                <IconComponent
+                                                    sx={{ color: iconColor }}
+                                                    titleAccess={typeLabel}
+                                                />
+                                            ) : (
+                                                <Typography variant="body2">
+                                                    {typeLabel}
+                                                </Typography>
+                                            )}
+                                        </TableCell>
+                                        <TableCell>{t.id}</TableCell>
+                                        <TableCell>{t.productId}</TableCell>
+                                        <TableCell>{t.product.name}</TableCell>
+                                        <TableCell>{t.product.brand}</TableCell>
+                                        <TableCell>{t.product.color}</TableCell>
+                                        <TableCell>{t.product.size}</TableCell>
+                                        <TableCell>
+                                            {t.supplierOrBuyer}
+                                        </TableCell>
+                                        <TableCell>{t.quantity}</TableCell>
+                                        <TableCell>
+                                            R${" "}
+                                            {parseFloat(
+                                                t.transactionPrice
+                                            ).toFixed(2)}
+                                        </TableCell>
+                                        <TableCell>
+                                            {t.transactionDate
+                                                ? format(
+                                                      new Date(
+                                                          t.transactionDate
+                                                      ),
+                                                      "dd/MM/yyyy HH:mm:ss"
+                                                  )
+                                                : "Data inválida"}
+                                        </TableCell>
+                                        <TableCell>{t.user.name}</TableCell>
+                                    </TableRow>
+                                );
+                            })}
                             {filteredTransactions.length === 0 && (
                                 <TableRow>
-                                    <TableCell colSpan={11} align="center">
+                                    <TableCell colSpan={12} align="center">
                                         Nenhuma transação registrada.
                                     </TableCell>
                                 </TableRow>
