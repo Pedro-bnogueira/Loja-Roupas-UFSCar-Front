@@ -16,6 +16,7 @@ import { styled } from "@mui/system";
 import PersonIcon from "@mui/icons-material/Person";
 import LockIcon from "@mui/icons-material/Lock";
 import roupaImg from "../assets/img/roupa.png";
+import theme from "../assets/theme";
 
 const url = process.env.REACT_APP_API_URL ? process.env.REACT_APP_API_URL : "";
 
@@ -208,11 +209,11 @@ export default function Login() {
                             fontSize: "1.4rem",
                             fontWeight: 700,
                             textTransform: "none",
-                            backgroundColor: "#F8CA41", // amarelo mais vivo
+                            backgroundColor: theme.palette.tertiary.dark, // amarelo mais vivo
                             color: "#000", // texto preto
                             borderRadius: "8px",
                             "&:hover": {
-                                backgroundColor: "#F8CA41", // um tom mais escuro
+                                backgroundColor: theme.palette.tertiary.dark_hover, // um tom mais escuro
                             },
                         }}
                     >
