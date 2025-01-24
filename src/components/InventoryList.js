@@ -28,15 +28,15 @@ import EditIcon from "@mui/icons-material/Edit";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import LocalMallIcon from "@mui/icons-material/LocalMall";
 import SearchIcon from "@mui/icons-material/Search";
-import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
+import CurrencyExchangeIcon from "@mui/icons-material/CurrencyExchange";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import * as XLSX from "xlsx";
 
 import TransactionForm from "./TransactionForm";
-import ReturnExchangeForm from './ReturnExchangeForm';
+import ReturnExchangeForm from "./ReturnExchangeForm";
 import { formatMoneyToFloat } from "../utils/formatMoneyToFloat"; // Certifique-se que esta função está correta
-import theme from '../assets/theme';
+import theme from "../assets/theme";
 
 const url = process.env.REACT_APP_API_URL ? process.env.REACT_APP_API_URL : "";
 
@@ -66,6 +66,11 @@ export default function InventoryList() {
         fetchProducts();
         fetchTransactions();
     }, []);
+
+    // Carregar tranascoes para troca e devolucoes
+    useEffect(() => {
+        fetchTransactions();
+    }, [openExchangeForm]);
 
     // Sempre que inventory mudar, atualiza filteredInventory também
     useEffect(() => {
@@ -105,7 +110,7 @@ export default function InventoryList() {
             const response = await axios.get(`${url}/api/get/transactions`, {
                 withCredentials: true,
             });
-    
+
             if (response.status === 200 && response.data.transactions) {
                 // Filtrar transações para incluir somente aquelas do tipo "out"
                 // e que ainda não tiveram devoluções
@@ -113,7 +118,7 @@ export default function InventoryList() {
                     (transaction) =>
                         transaction.type === "out" && !transaction.isReturned
                 );
-    
+
                 setTransactions(filteredTransactions);
             }
         } catch (error) {
@@ -312,32 +317,68 @@ export default function InventoryList() {
 
     const handleSaveTransaction = (newTransaction) => {
         const { type, productId, quantity } = newTransaction;
-
-        // Atualiza o estoque local
-        const updatedInventory = inventory.map((item) => {
-            if (item.productId === productId) {
-                const updatedQuantity =
-                    type === "in" || "return"
-                        ? item.quantity + quantity
-                        : item.quantity - quantity;
-                return { ...item, quantity: updatedQuantity };
+        console.log(type);
+        console.log(productId);
+        console.log(quantity);
+    
+        setFilteredInventory((prevInventory) => {
+            const updatedInventory = prevInventory.map((item) => {
+                if (item.productId === productId) {
+                    let updatedQuantity;
+        
+                    if (type === "in" || type === "return" || type === "exchange_in") {
+                        updatedQuantity = item.quantity + quantity;
+                    } else if (type === "out" || type === "exchange_out") {
+                        updatedQuantity = item.quantity - quantity;
+                    } else {
+                        // Tipo de transação inválido
+                        handleSnackbarOpen(
+                            "Tipo de transação inválido.",
+                            "error"
+                        );
+                        return item;
+                    }
+        
+                    // Certifique-se de que a quantidade nunca seja negativa
+                    if (updatedQuantity < 0) {
+                        handleSnackbarOpen(
+                            "Estoque insuficiente para realizar a transação.",
+                            "error"
+                        );
+                        return item;
+                    }
+        
+                    return { ...item, quantity: updatedQuantity };
+                }
+                return item;
+            });
+        
+            // Se o produto não existir no estoque, adiciona um novo item para transações de entrada
+            if (!prevInventory.some((item) => item.productId === productId) &&
+                (type === "in" || type === "return" || type === "exchange_in")) {
+                const product = products.find((p) => p.id === productId);
+                if (product) {
+                    updatedInventory.push({
+                        productId: product.id,
+                        product: product,
+                        quantity: quantity,
+                    });
+                } else {
+                    handleSnackbarOpen(
+                        "Produto selecionado não encontrado.",
+                        "error"
+                    );
+                }
             }
-            return item;
+        
+            return updatedInventory;
         });
-        setInventory(updatedInventory);
-
-        // Mostra feedback
-        handleSnackbarOpen(
-            `Transação de ${
-                type === "in" ? "compra" : "venda"
-            } registrada com sucesso!`,
-            "success"
-        );
-
-        // Fecha o modal
+        
+        // Fecha os modais
         setOpenTransactionForm(false);
-        setOpenExchangeForm(false);
+        setOpenExchangeForm(false);        
     };
+    
 
     // Funções de Snackbar
     const handleSnackbarOpen = (message, severity = "success") => {
@@ -597,10 +638,11 @@ export default function InventoryList() {
             />
 
             {/* Modal para registrar troca/devolucao */}
-            <ExchangeForm
+            <ReturnExchangeForm
                 open={openExchangeForm}
                 onClose={handleCloseExchangeForm}
-                transactions={transactions} 
+                transactions={transactions}
+                products={products}
                 onSave={handleSaveTransaction}
                 setSnackbar={setSnackbar}
             />
