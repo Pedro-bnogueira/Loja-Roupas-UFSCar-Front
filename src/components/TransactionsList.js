@@ -26,6 +26,7 @@ import {
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward"; // Ícone para Saída
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward"; // Ícone para Entrada
 import ReplayIcon from "@mui/icons-material/Replay"; // Ícone para devoluções
+import SwapHorizIcon from "@mui/icons-material/SwapHoriz"; // Ícone para trocas
 import SearchIcon from "@mui/icons-material/Search";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
@@ -251,7 +252,11 @@ export default function TransactionsList() {
                     ? "Entrada"
                     : item.type === "out"
                     ? "Saída"
-                    : "Devolução";
+                    : item.type === "return"
+                    ? "Devolução"
+                    : item.type === "exchange_in"
+                    ? "Devolução da troca"
+                    : "Saída da troca"
             return [
                 typeIcon,
                 item.id,
@@ -322,7 +327,11 @@ export default function TransactionsList() {
                         ? "Entrada"
                         : item.type === "out"
                         ? "Saída"
-                        : "Devolução";
+                        : item.type === "return"
+                        ? "Devolução"
+                        : item.type === "exchange_in"
+                        ? "Devolução da troca"
+                        : "Saída da troca"
                 return [
                     typeIcon,
                     item.id,
@@ -542,8 +551,18 @@ export default function TransactionsList() {
                                         break;
                                     case "return":
                                         IconComponent = ReplayIcon;
-                                        iconColor = "orange"; // Escolha a cor que preferir
+                                        iconColor = "orange"; 
                                         typeLabel = "Devolução";
+                                        break;
+                                    case "exchange_in":
+                                        IconComponent = SwapHorizIcon;
+                                        iconColor = "green"; 
+                                        typeLabel = "Devolução da troca";
+                                        break;
+                                    case "exchange_out":
+                                        IconComponent = SwapHorizIcon;
+                                        iconColor = "red"; 
+                                        typeLabel = "Saída da troca";
                                         break;
                                     default:
                                         IconComponent = null;
