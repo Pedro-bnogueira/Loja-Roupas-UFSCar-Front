@@ -59,6 +59,7 @@ export default function ProductList() {
         size: "",
         color: "",
         categoryName: "",
+        alertThreshold: "",
     });
     const [selectedProductId, setSelectedProductId] = useState(null);
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
@@ -117,6 +118,7 @@ export default function ProductList() {
             size: "",
             color: "",
             categoryName: "",
+            alertThreshold: "",
         });
         setOpenFormDialog(true);
     };
@@ -137,6 +139,7 @@ export default function ProductList() {
             size: product.size || "",
             color: product.color || "",
             categoryName: currentCategoryName,
+            alertThreshold: product.alertThreshold,
         });
         setOpenFormDialog(true);
     };
@@ -161,6 +164,7 @@ export default function ProductList() {
                 size: data.size,
                 color: data.color,
                 category: data.categoryName,
+                alertThreshold: data.alertThreshold ? parseInt(data.alertThreshold) : null
             };
 
             if (formMode === "create") {
@@ -254,7 +258,7 @@ export default function ProductList() {
 
     // Identifica se o campo selecionado é numérico
     const isFieldNumeric = (field) => {
-        const numericFields = ["id", "price"];
+        const numericFields = ["id", "price", "alertThreshold"];
         return numericFields.includes(field);
     };
 
@@ -357,7 +361,7 @@ export default function ProductList() {
 
         // Cabeçalhos e dados para autoTable
         const headers = [
-            ["ID", "Nome", "Marca", "Preço", "Tamanho", "Cor", "Categoria"],
+            ["ID", "Nome", "Marca", "Preço", "Tamanho", "Cor", "Categoria", "Quantidade Mínima de Estoque"],
         ];
         const rows = filteredProducts.map((item) => {
             const formattedPrice = parseFloat(item.price).toFixed(2);
@@ -386,7 +390,7 @@ export default function ProductList() {
 
     const handleExportExcel = () => {
         const sheetData = [
-            ["ID", "Nome", "Marca", "Preço", "Tamanho", "Cor", "Categoria"],
+            ["ID", "Nome", "Marca", "Preço", "Tamanho", "Cor", "Categoria", " Quantidade Mínima de Estoque"],
             ...filteredProducts.map((item) => {
                 const formattedPrice = parseFloat(item.price).toFixed(2);
                 return [
@@ -476,6 +480,7 @@ export default function ProductList() {
                         <MenuItem value="size">Tamanho</MenuItem>
                         <MenuItem value="color">Cor</MenuItem>
                         <MenuItem value="category.name">Categoria</MenuItem>
+                        <MenuItem value="alertThreshold"> Quantidade Mínima de Estoque</MenuItem>
                     </Select>
                 </FormControl>
 
@@ -555,6 +560,9 @@ export default function ProductList() {
                                     <strong>Categoria</strong>
                                 </TableCell>
                                 <TableCell>
+                                    <strong>Quantidade Mínima de Estoque</strong>
+                                </TableCell>
+                                <TableCell>
                                     <strong>Ações</strong>
                                 </TableCell>
                             </TableRow>
@@ -572,6 +580,9 @@ export default function ProductList() {
                                     <TableCell>{p.color}</TableCell>
                                     <TableCell>
                                         {p.category ? p.category.name : ""}
+                                    </TableCell>
+                                    <TableCell>
+                                        {p.alertThreshold || "-"}
                                     </TableCell>
                                     <TableCell>
                                         <IconButton

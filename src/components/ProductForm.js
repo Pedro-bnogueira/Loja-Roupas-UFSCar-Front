@@ -142,6 +142,16 @@ const ProductForm = ({ open, onClose, mode, formData, onSave, categories }) => {
                             ))}
                         </Select>
                     </FormControl>
+                    <TextField
+                        label="Alerta de Estoque Mínimo"
+                        name="alertThreshold"
+                        type="number"
+                        value={data.alertThreshold}
+                        onChange={handleChange}
+                        fullWidth
+                        inputProps={{ min: 0 }}
+                        helperText="Quantidade mínima para gerar alerta"
+                    />
                 </Box>
             </DialogContent>
             <DialogActions>

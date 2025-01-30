@@ -29,6 +29,7 @@ import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import LocalMallIcon from "@mui/icons-material/LocalMall";
 import SearchIcon from "@mui/icons-material/Search";
 import CurrencyExchangeIcon from "@mui/icons-material/CurrencyExchange";
+import WarningIcon from "@mui/icons-material/Warning";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import * as XLSX from "xlsx";
@@ -320,13 +321,17 @@ export default function InventoryList() {
         console.log(type);
         console.log(productId);
         console.log(quantity);
-    
+
         setFilteredInventory((prevInventory) => {
             const updatedInventory = prevInventory.map((item) => {
                 if (item.productId === productId) {
                     let updatedQuantity;
-        
-                    if (type === "in" || type === "return" || type === "exchange_in") {
+
+                    if (
+                        type === "in" ||
+                        type === "return" ||
+                        type === "exchange_in"
+                    ) {
                         updatedQuantity = item.quantity + quantity;
                     } else if (type === "out" || type === "exchange_out") {
                         updatedQuantity = item.quantity - quantity;
@@ -338,7 +343,7 @@ export default function InventoryList() {
                         );
                         return item;
                     }
-        
+
                     // Certifique-se de que a quantidade nunca seja negativa
                     if (updatedQuantity < 0) {
                         handleSnackbarOpen(
@@ -347,15 +352,17 @@ export default function InventoryList() {
                         );
                         return item;
                     }
-        
+
                     return { ...item, quantity: updatedQuantity };
                 }
                 return item;
             });
-        
+
             // Se o produto não existir no estoque, adiciona um novo item para transações de entrada
-            if (!prevInventory.some((item) => item.productId === productId) &&
-                (type === "in" || type === "return" || type === "exchange_in")) {
+            if (
+                !prevInventory.some((item) => item.productId === productId) &&
+                (type === "in" || type === "return" || type === "exchange_in")
+            ) {
                 const product = products.find((p) => p.id === productId);
                 if (product) {
                     updatedInventory.push({
@@ -370,15 +377,14 @@ export default function InventoryList() {
                     );
                 }
             }
-        
+
             return updatedInventory;
         });
-        
+
         // Fecha os modais
         setOpenTransactionForm(false);
-        setOpenExchangeForm(false);        
+        setOpenExchangeForm(false);
     };
-    
 
     // Funções de Snackbar
     const handleSnackbarOpen = (message, severity = "success") => {
@@ -395,7 +401,8 @@ export default function InventoryList() {
             open: false,
         });
     };
-
+    console.log(filteredInventory);
+    console.log(inventory);
     return (
         <Box sx={{ paddingX: 2 }}>
             <Typography
@@ -588,7 +595,103 @@ export default function InventoryList() {
                                         <TableCell>
                                             {item.product.size}
                                         </TableCell>
-                                        <TableCell>{item.quantity}</TableCell>
+                                        <TableCell>
+                                            <Box
+                                                sx={{
+                                                    display: "flex",
+                                                    alignItems: "center",
+                                                    gap: 1,
+                                                    position: "relative",
+                                                }}
+                                            >
+                                                {/* Texto com destaque condicional */}
+                                                <Typography
+                                                    variant="body1"
+                                                    sx={{
+                                                        fontWeight:
+                                                            item.product
+                                                                .alertThreshold &&
+                                                            item.quantity <=
+                                                                item.product
+                                                                    .alertThreshold
+                                                                ? 700
+                                                                : 400,
+                                                        color:
+                                                            item.product
+                                                                .alertThreshold &&
+                                                            item.quantity <=
+                                                                item.product
+                                                                    .alertThreshold
+                                                                ? theme.palette
+                                                                      .error
+                                                                      .main
+                                                                : "inherit",
+                                                    }}
+                                                >
+                                                    {item.quantity.toLocaleString(
+                                                        "pt-BR"
+                                                    )}
+                                                </Typography>
+
+                                                {/* Ícone com fundo e animação */}
+                                                {item.product.alertThreshold &&
+                                                    item.quantity <=
+                                                        item.product
+                                                            .alertThreshold && (
+                                                        <Tooltip
+                                                            title={`Estoque mínimo: ${item.product.alertThreshold} | Atual: ${item.quantity}`}
+                                                            arrow
+                                                        >
+                                                            <Box
+                                                                sx={{
+                                                                    display:
+                                                                        "flex",
+                                                                    alignItems:
+                                                                        "center",
+                                                                    bgcolor:
+                                                                        theme
+                                                                            .palette
+                                                                            .error
+                                                                            .light,
+                                                                    borderRadius:
+                                                                        "50%",
+                                                                    p: 0.5,
+                                                                    animation:
+                                                                        "pulse 1.5s infinite",
+                                                                    "@keyframes pulse":
+                                                                        {
+                                                                            "0%": {
+                                                                                transform:
+                                                                                    "scale(1)",
+                                                                            },
+                                                                            "50%": {
+                                                                                transform:
+                                                                                    "scale(1.1)",
+                                                                            },
+                                                                            "100%": {
+                                                                                transform:
+                                                                                    "scale(1)",
+                                                                            },
+                                                                        },
+                                                                }}
+                                                            >
+                                                                <WarningIcon
+                                                                    sx={{
+                                                                        color: theme
+                                                                            .palette
+                                                                            .error
+                                                                            .contrastText,
+                                                                        fontSize:
+                                                                            "1rem",
+                                                                        verticalAlign:
+                                                                            "middle",
+                                                                    }}
+                                                                />
+                                                            </Box>
+                                                        </Tooltip>
+                                                    )}
+                                            </Box>
+                                        </TableCell>
                                         <TableCell>R$ {stockValue}</TableCell>
                                         <TableCell>
                                             <Tooltip title="Editar Estoque">
