@@ -23,6 +23,10 @@ import {
     FormControl,
     InputLabel,
     InputAdornment,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
@@ -55,6 +59,12 @@ export default function InventoryList() {
     const [openTransactionForm, setOpenTransactionForm] = useState(false);
     const [openExchangeForm, setOpenExchangeForm] = useState(false);
     const [transactionType, setTransactionType] = useState("in"); // 'in' (compra) ou 'out' (venda)
+    // Estados para Edição
+    const [editOpen, setEditOpen] = useState(false);
+    const [selectedStock, setSelectedStock] = useState(null);
+    const [editQuantity, setEditQuantity] = useState("");
+    const [editAlertThreshold, setEditAlertThreshold] = useState("");
+    // Estados Snackbar
     const [snackbar, setSnackbar] = useState({
         open: false,
         message: "",
@@ -386,6 +396,60 @@ export default function InventoryList() {
         setOpenExchangeForm(false);
     };
 
+    // Funções de Edição
+
+    // **Abrir modal de edição**
+    const handleOpenEdit = (stockItem) => {
+        setSelectedStock(stockItem);
+        setEditQuantity(stockItem.quantity);
+        setEditOpen(true);
+    };
+
+    // **Fechar modal de edição**
+    const handleCloseEdit = () => {
+        setEditOpen(false);
+        setSelectedStock(null);
+    };
+    console.log(selectedStock)
+    // **Salvar alterações**
+    const handleSaveEdit = async () => {
+        if (!selectedStock) return;
+
+        try {
+            const response = await axios.put(
+                `${url}/api/update/stock/${selectedStock.stockId}`,
+                {
+                    quantity: editQuantity,
+                },
+                { withCredentials: true }
+            );
+
+            if (response.status === 200) {
+                handleSnackbarOpen(
+                    "Estoque atualizado com sucesso!",
+                    "success"
+                );
+
+                // Atualizar estado do inventário
+                setFilteredInventory((prevInventory) =>
+                    prevInventory.map((item) =>
+                        item.stockId === selectedStock.stockId
+                            ? {
+                                  ...item,
+                                  quantity: editQuantity,
+                              }
+                            : item
+                    )
+                );
+
+                handleCloseEdit();
+            }
+        } catch (error) {
+            console.error("Erro ao atualizar estoque:", error);
+            handleSnackbarOpen("Erro ao atualizar estoque.", "error");
+        }
+    };
+
     // Funções de Snackbar
     const handleSnackbarOpen = (message, severity = "success") => {
         setSnackbar({
@@ -705,11 +769,7 @@ export default function InventoryList() {
                                                                 "#8ade93",
                                                         },
                                                     }}
-                                                    onClick={() =>
-                                                        alert(
-                                                            `Editar estoque do produto ID ${item.productId}`
-                                                        )
-                                                    }
+                                                    onClick={() => handleOpenEdit(item)}
                                                 >
                                                     <EditIcon />
                                                 </IconButton>
@@ -729,6 +789,44 @@ export default function InventoryList() {
                     </Table>
                 </TableContainer>
             </Paper>
+
+            {/* Modal de Edição */}
+            <Dialog
+                open={editOpen}
+                onClose={handleCloseEdit}
+                maxWidth="sm"
+                fullWidth
+            >
+                <DialogTitle>Editar Estoque</DialogTitle>
+                <DialogContent>
+                    <Typography variant="subtitle1">
+                        Produto: {selectedStock?.product.name}
+                    </Typography>
+
+                    <TextField
+                        label="Quantidade"
+                        type="number"
+                        fullWidth
+                        margin="normal"
+                        value={editQuantity}
+                        onChange={(e) =>
+                            setEditQuantity(Number(e.target.value))
+                        }
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseEdit} color="secondary">
+                        Cancelar
+                    </Button>
+                    <Button
+                        onClick={handleSaveEdit}
+                        variant="contained"
+                        color="primary"
+                    >
+                        Salvar
+                    </Button>
+                </DialogActions>
+            </Dialog>
 
             {/* Modal para registrar compra/venda */}
             <TransactionForm
