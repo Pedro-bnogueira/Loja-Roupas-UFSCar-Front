@@ -10,9 +10,6 @@ import ProductsAndCategories from './pages/Products/ProductAndCategories';
 import InventoryAndTransactions from './pages/Inventory/InventoryAndTransactions';
 import Dashboard from "./components/Dashboard";
 
-// função temporaria "em construção"
-import Building from "./pages/Building";
-
 function App() {
   return (
       <AuthProvider>
