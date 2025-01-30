@@ -20,8 +20,8 @@ import logo from '../assets/img/logo.png'
 
 const menuItems = [
   { text: 'Início', icon: <HomeIcon />, link: '/' },
-  { text: 'Produtos', icon: <StorefrontIcon />, link: '/products', adminOnly: false },
   { text: 'Estoque', icon: <Inventory2Icon />, link: '/estoque', adminOnly: false },
+  { text: 'Produtos', icon: <StorefrontIcon />, link: '/products', adminOnly: false },
   { text: 'Administração', icon: <AdminPanelSettingsIcon />, link: '/adm/users', adminOnly: true },
 ];
 
