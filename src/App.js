@@ -8,6 +8,7 @@ import Home from "./pages/Home";
 import UserList from "./pages/Users/UserList";
 import ProductsAndCategories from './pages/Products/ProductAndCategories';
 import InventoryAndTransactions from './pages/Inventory/InventoryAndTransactions';
+import Dashboard from "./components/Dashboard";
 
 // função temporaria "em construção"
 import Building from "./pages/Building";
@@ -20,7 +21,7 @@ function App() {
             <Routes>
               <Route path="/login" element={<Login />} />
               <Route path="/" element={<Home />}>
-                <Route path="/" element={<Building />} />
+                <Route path="/" element={<Dashboard />} />
                 <Route path="adm/users" element={<UserList />} />
                 <Route path="/products" element={<ProductsAndCategories />} />
                 <Route path="/estoque" element={<InventoryAndTransactions />} />
