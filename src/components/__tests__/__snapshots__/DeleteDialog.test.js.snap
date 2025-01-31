@@ -1,0 +1,5 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`DeleteDialog Component matches snapshot when closed 1`] = `<DocumentFragment />`;
+
+exports[`DeleteDialog Component matches snapshot when open 1`] = `<DocumentFragment />`;

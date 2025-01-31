@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import {
-  Box, Typography, Paper, Table, TableBody, TableCell, TableContainer,
+  Typography, Paper, Table, TableBody, TableCell, TableContainer,
   TableHead, TableRow, Button, IconButton, Snackbar, Alert
 } from "@mui/material";
 import DeleteIcon from '@mui/icons-material/Delete';

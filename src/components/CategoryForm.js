@@ -28,7 +28,7 @@ const CategoryForm = ({ open, onClose, formData, onSave }) => {
     };
 
     return (
-        <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
+        <Dialog open={open} id="category-form" onClose={onClose} fullWidth maxWidth="sm">
             <DialogTitle>Adicionar Categoria</DialogTitle>
             <DialogContent>
                 <Box
