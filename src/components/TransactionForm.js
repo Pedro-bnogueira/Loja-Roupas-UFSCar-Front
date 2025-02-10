@@ -108,11 +108,13 @@ export default function TransactionForm({ open, onClose, type, products, onSave,
         >
           {/* Produto */}
           <FormControl fullWidth error={!!errors.productId}>
-            <InputLabel>Produto</InputLabel>
+            <InputLabel id="produto-label">Produto</InputLabel>
             <Select
+              labelId="produto-label"
               value={productId}
               label="Produto"
               onChange={(e) => setProductId(e.target.value)}
+              inputProps={{ 'aria-label': 'Produto' }}
             >
               {products.map((prod) => (
                 <MenuItem key={prod.id} value={prod.id}>
@@ -134,7 +136,7 @@ export default function TransactionForm({ open, onClose, type, products, onSave,
             fullWidth
             error={!!errors.quantity}
             helperText={errors.quantity}
-            inputProps={{ min: 1 }}
+            inputProps={{ min: 1, 'aria-label': 'Quantidade' }}
           />
 
           {/* Preço */}
@@ -155,6 +157,7 @@ export default function TransactionForm({ open, onClose, type, products, onSave,
             error={!!errors.price}
             helperText={errors.price}
             required
+            inputProps={{ 'aria-label': 'Preço Total (R$)' }}
           />
 
           {/* Fornecedor/Comprador */}
@@ -166,6 +169,7 @@ export default function TransactionForm({ open, onClose, type, products, onSave,
             error={!!errors.supplierOrBuyer}
             helperText={errors.supplierOrBuyer}
             required
+            inputProps={{ 'aria-label': type === 'in' ? "Fornecedor" : "Comprador" }}
           />
         </Box>
       </DialogContent>

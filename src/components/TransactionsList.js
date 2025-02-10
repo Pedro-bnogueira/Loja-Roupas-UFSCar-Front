@@ -68,7 +68,7 @@ export default function TransactionsList() {
                 setTransactions(response.data.transactions);
             }
         } catch (error) {
-            console.error(error);
+            console.error("Erro ao buscar transações:", error);
             handleSnackbarOpen("Erro ao buscar estoque.", "error");
         }
     };
@@ -394,18 +394,13 @@ export default function TransactionsList() {
 
                 {/* Filtro por Atributo */}
                 <FormControl size="small" sx={{ minWidth: 200 }}>
-                    <InputLabel>Filtro</InputLabel>
+                    <InputLabel id="filter-field-label">Filtro</InputLabel>
                     <Select
+                        labelId="filter-field-label"
                         value={filterField}
                         label="Atributo"
                         onChange={(e) => setFilterField(e.target.value)}
                     >
-                        {/* Atributos possíveis:
-                            - id, productId, quantity, price, transactionPrice
-                            - product.name, product.brand, product.color, product.size
-                            - supplierOrBuyer
-                            - user.name
-                        */}
                         <MenuItem value="">Nenhum</MenuItem>
                         <MenuItem value="id">ID da Transação</MenuItem>
                         <MenuItem value="productId">Código do Produto</MenuItem>
@@ -451,8 +446,9 @@ export default function TransactionsList() {
                         />
                     ) : (
                         <FormControl size="small" sx={{ minWidth: 200 }}>
-                            <InputLabel>Valor</InputLabel>
+                            <InputLabel id="filter-value-label">Valor</InputLabel>
                             <Select
+                                labelId="filter-value-label"
                                 value={filterValue}
                                 label="Valor"
                                 onChange={(e) => setFilterValue(e.target.value)}

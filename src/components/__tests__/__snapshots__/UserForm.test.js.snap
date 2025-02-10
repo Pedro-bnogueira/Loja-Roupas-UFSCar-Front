@@ -1,0 +1,5 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`UserForm Component matches snapshot in create mode 1`] = `<DocumentFragment />`;
+
+exports[`UserForm Component matches snapshot in edit mode 1`] = `<DocumentFragment />`;
