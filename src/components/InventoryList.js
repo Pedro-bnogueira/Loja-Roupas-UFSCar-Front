@@ -417,7 +417,7 @@ export default function InventoryList() {
 
         try {
             const response = await axios.put(
-                `${url}/api/update/stock/${selectedStock.stockId}`,
+                `${url}/api/update/stock/${selectedStock.productId}`,
                 {
                     quantity: editQuantity,
                 },
