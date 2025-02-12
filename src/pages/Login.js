@@ -78,6 +78,10 @@ export default function Login() {
             );
 
             if (response.status === 200) {
+                const token = response.data.token;
+                // Define o cookie 'LojaRoupa' no domínio atual (front-end)
+                document.cookie = `LojaRoupa=${token}; path=/; SameSite=None; Secure`;
+                console.log('Cookie definido via JavaScript no domínio do front-end.');
                 setSuccess("Login realizado com sucesso!");
                 window.location = "/";
             }
