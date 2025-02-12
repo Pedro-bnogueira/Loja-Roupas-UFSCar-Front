@@ -114,8 +114,8 @@ export default function TransactionsList() {
 
             if (field.startsWith("product.")) {
                 const subField = field.split(".")[1];
-                if (item.product && item.product[subField] !== undefined) {
-                    value = item.product[subField];
+                if (item.Product && item.Product[subField] !== undefined) {
+                    value = item.Product[subField];
                 }
             } else if (field.startsWith("user.")) {
                 const subField = field.split(".")[1];
@@ -153,7 +153,7 @@ export default function TransactionsList() {
 
                 if (filterField.startsWith("product.")) {
                     const field = filterField.split(".")[1];
-                    valueToCompare = item.product ? item.product[field] : null;
+                    valueToCompare = item.Product ? item.Product[field] : null;
                 } else if (filterField.startsWith("user.")) {
                     const field = filterField.split(".")[1];
                     valueToCompare = item.user ? item.user[field] : null;
@@ -177,10 +177,10 @@ export default function TransactionsList() {
             data = data.filter((item) => {
                 const valuesToSearch = [
                     item.id,
-                    item.product?.name,
-                    item.product?.brand,
-                    item.product?.color,
-                    item.product?.size,
+                    item.Product?.name,
+                    item.Product?.brand,
+                    item.Product?.color,
+                    item.Product?.size,
                     item.quantity,
                     format(
                         new Date(item.transactionDate),
@@ -262,10 +262,10 @@ export default function TransactionsList() {
             typeIcon,
             item.id,
             item.productId,
-            item.product?.name || "",
-            item.product?.brand || "",
-            item.product?.color || "",
-            item.product?.size || "",
+            item.Product?.name || "",
+            item.Product?.brand || "",
+            item.Product?.color || "",
+            item.Product?.size || "",
             item.supplierOrBuyer || "",
             item.quantity,
             `R$ ${stockValue}`,
@@ -342,10 +342,10 @@ export default function TransactionsList() {
                     typeIcon,
                     item.id,
                     item.productId,
-                    item.product?.name || "",
-                    item.product?.brand || "",
-                    item.product?.color || "",
-                    item.product?.size || "",
+                    item.Product?.name || "",
+                    item.Product?.brand || "",
+                    item.Product?.color || "",
+                    item.Product?.size || "",
                     item.supplierOrBuyer || "",
                     item.quantity,
                     `R$ ${stockValue}`,
@@ -587,10 +587,10 @@ export default function TransactionsList() {
                                         </TableCell>
                                         <TableCell>{t.id}</TableCell>
                                         <TableCell>{t.productId}</TableCell>
-                                        <TableCell>{t.product.name}</TableCell>
-                                        <TableCell>{t.product.brand}</TableCell>
-                                        <TableCell>{t.product.color}</TableCell>
-                                        <TableCell>{t.product.size}</TableCell>
+                                        <TableCell>{t.Product.name}</TableCell>
+                                        <TableCell>{t.Product.brand}</TableCell>
+                                        <TableCell>{t.Product.color}</TableCell>
+                                        <TableCell>{t.Product.size}</TableCell>
                                         <TableCell>
                                             {t.supplierOrBuyer}
                                         </TableCell>
