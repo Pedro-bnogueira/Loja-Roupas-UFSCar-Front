@@ -373,6 +373,7 @@ export default function ProductList() {
                 item.size,
                 item.color,
                 item.category ? item.category.name : "",
+                item.alertThreshold,
             ];
         });
 
@@ -401,6 +402,7 @@ export default function ProductList() {
                     item.size,
                     item.color,
                     item.category ? item.category.name : "",
+                    item.alertThreshold,
                 ];
             }),
         ];

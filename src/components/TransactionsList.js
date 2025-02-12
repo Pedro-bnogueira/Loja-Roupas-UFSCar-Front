@@ -220,84 +220,90 @@ export default function TransactionsList() {
 
     // Exportar para PDF
     const handleExportPDF = () => {
-        const doc = new jsPDF("p", "pt");
-        doc.setFontSize(13);
-        doc.text("Relatório de Transações", 40, 40);
-
-        // Cabeçalhos e dados para autoTable
+        // PDF em orientação paisagem para maior largura
+        const doc = new jsPDF("l", "pt");
+        doc.setFontSize(10);
+        doc.text("Relatório de Transações", 20, 30);
+      
         const headers = [
-            [
-                "Tipo",
-                "Código da Transação",
-                "Código do Produto",
-                "Nome",
-                "Marca",
-                "Cor",
-                "Tamanho",
-                "Fornecedor/Comprador",
-                "Quantidade",
-                "Preço da Transação (R$)",
-                "Data da Transação",
-                "Usuário Responsável",
-            ],
+          [
+            "Tipo",
+            "Código da Transação",
+            "Código do Produto",
+            "Nome",
+            "Marca",
+            "Cor",
+            "Tamanho",
+            "Fornecedor/Comprador",
+            "Quantidade",
+            "Preço da Transação (R$)",
+            "Data da Transação",
+            "Usuário Responsável",
+          ],
         ];
+      
         const rows = filteredTransactions.map((item) => {
-            const stockValue = parseFloat(item.transactionPrice).toFixed(2);
-            const formattedDate = format(
-                new Date(item.transactionDate),
-                "dd/MM/yyyy HH:mm:ss"
-            );
-            const typeIcon =
-                item.type === "in"
-                    ? "Entrada"
-                    : item.type === "out"
-                    ? "Saída"
-                    : item.type === "return"
-                    ? "Devolução"
-                    : item.type === "exchange_in"
-                    ? "Devolução da troca"
-                    : "Saída da troca"
-            return [
-                typeIcon,
-                item.id,
-                item.productId,
-                item.product?.name || "",
-                item.product?.brand || "",
-                item.product?.color || "",
-                item.product?.size || "",
-                item.supplierOrBuyer || "",
-                item.quantity,
-                `R$ ${stockValue}`,
-                formattedDate,
-                item.user?.name || "",
-            ];
+          const stockValue = parseFloat(item.transactionPrice).toFixed(2);
+          const formattedDate = format(
+            new Date(item.transactionDate),
+            "dd/MM/yyyy HH:mm:ss"
+          );
+          const typeIcon =
+            item.type === "in"
+              ? "Entrada"
+              : item.type === "out"
+              ? "Saída"
+              : item.type === "return"
+              ? "Devolução"
+              : item.type === "exchange_in"
+              ? "Devolução da troca"
+              : "Saída da troca";
+          return [
+            typeIcon,
+            item.id,
+            item.productId,
+            item.product?.name || "",
+            item.product?.brand || "",
+            item.product?.color || "",
+            item.product?.size || "",
+            item.supplierOrBuyer || "",
+            item.quantity,
+            `R$ ${stockValue}`,
+            formattedDate,
+            item.user?.name || "",
+          ];
         });
-
+      
         doc.autoTable({
-            head: headers,
-            body: rows,
-            startY: 60,
-            margin: { left: 40, right: 40 },
-            styles: { fontSize: 10, halign: "center" },
-            headStyles: { fillColor: [41, 128, 185] },
-            columnStyles: {
-                0: { cellWidth: 50 }, // Tipo
-                1: { cellWidth: 80 }, // Código da Transação
-                2: { cellWidth: 80 }, // Código do Produto
-                3: { cellWidth: 100 }, // Nome
-                4: { cellWidth: 80 }, // Marca
-                5: { cellWidth: 60 }, // Cor
-                6: { cellWidth: 60 }, // Tamanho
-                7: { cellWidth: 120 }, // Fornecedor/Comprador
-                8: { cellWidth: 60 }, // Quantidade
-                9: { cellWidth: 80 }, // Preço da Transação
-                10: { cellWidth: 120 }, // Data da Transação
-                11: { cellWidth: 100 }, // Usuário Responsável
-            },
+          head: headers,
+          body: rows,
+          startY: 40,
+          margin: { left: 20, right: 20 },
+          styles: {
+            fontSize: 8,        // Tamanho de fonte reduzido para caber mais conteúdo
+            overflow: "linebreak", // Permite quebra de linha automática
+          },
+          headStyles: { fillColor: [41, 128, 185] },
+          columnStyles: {
+            0: { cellWidth: 40 },   // Tipo
+            1: { cellWidth: 60 },   // Código da Transação
+            2: { cellWidth: 60 },   // Código do Produto
+            3: { cellWidth: 80 },   // Nome
+            4: { cellWidth: 60 },   // Marca
+            5: { cellWidth: 50 },   // Cor
+            6: { cellWidth: 50 },   // Tamanho
+            7: { cellWidth: 100 },  // Fornecedor/Comprador (reduzido para liberar espaço)
+            8: { cellWidth: 60 },   // Quantidade
+            9: { cellWidth: 60 },   // Preço da Transação
+            10: { cellWidth: 90 },  // Data da Transação
+            11: { cellWidth: 90 },  // Usuário Responsável
+          },
         });
-
+      
         doc.save("transacoes.pdf");
-    };
+      };
+      
+      
 
     // Exportar para Excel
     const handleExportExcel = () => {
