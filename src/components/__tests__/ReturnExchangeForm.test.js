@@ -34,7 +34,7 @@ const transactionsMock = [
     id: "txn1",
     productId: 101,
     transactionPrice: "100",
-    product: {
+    Product: {
       name: "Product A",
       brand: "Brand A",
       color: "Red",
@@ -189,7 +189,7 @@ describe("ReturnExchangeForm Component", () => {
       id: "txn2",
       productId: 101,
       transactionPrice: "100",
-      product: { name: "Product A", brand: "Brand A", color: "Red", size: "M", price: "100" },
+      Product: { name: "Product A", brand: "Brand A", color: "Red", size: "M", price: "100" },
       quantity: 1,
       supplierOrBuyer: "Supplier A",
       transactionDate: "2020-01-01T12:00:00Z",

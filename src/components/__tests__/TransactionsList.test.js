@@ -63,7 +63,7 @@ describe('TransactionsList', () => {
         id: 1,
         type: 'in',
         productId: 101,
-        product: {
+        Product: {
           name: 'Camiseta Oversized',
           brand: 'Brand A',
           color: 'Preto',
@@ -79,7 +79,7 @@ describe('TransactionsList', () => {
         id: 2,
         type: 'out',
         productId: 102,
-        product: {
+        Product: {
           name: 'Calça Jeans',
           brand: 'Brand B',
           color: 'Azul',
@@ -143,7 +143,7 @@ describe('TransactionsList', () => {
         id: 1,
         type: 'in',
         productId: 101,
-        product: {
+        Product: {
           name: 'Blusa Moletom',
           brand: 'Loja 1',
           color: 'Cinza',
@@ -159,7 +159,7 @@ describe('TransactionsList', () => {
         id: 2,
         type: 'out',
         productId: 102,
-        product: {
+        Product: {
           name: 'Blusa Moletom',
           brand: 'Loja 2',
           color: 'Preto',
