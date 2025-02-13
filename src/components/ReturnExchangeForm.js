@@ -323,25 +323,25 @@ export default function ReturnExchangeForm({
                                     <Grid item xs={12} sm={6}>
                                         <Typography variant="subtitle2">Produto</Typography>
                                         <Typography variant="body1">
-                                            {selectedTransaction.product.name}
+                                            {selectedTransaction.Product.name}
                                         </Typography>
                                     </Grid>
                                     <Grid item xs={12} sm={6}>
                                         <Typography variant="subtitle2">Marca</Typography>
                                         <Typography variant="body1">
-                                            {selectedTransaction.product.brand}
+                                            {selectedTransaction.Product.brand}
                                         </Typography>
                                     </Grid>
                                     <Grid item xs={12} sm={6}>
                                         <Typography variant="subtitle2">Cor</Typography>
                                         <Typography variant="body1">
-                                            {selectedTransaction.product.color}
+                                            {selectedTransaction.Product.color}
                                         </Typography>
                                     </Grid>
                                     <Grid item xs={12} sm={6}>
                                         <Typography variant="subtitle2">Tamanho</Typography>
                                         <Typography variant="body1">
-                                            {selectedTransaction.product.size}
+                                            {selectedTransaction.Product.size}
                                         </Typography>
                                     </Grid>
                                     <Grid item xs={12} sm={6}>
